@@ -114,10 +114,16 @@ func _test_drawing() -> void:
 		print("drawing %s: verts=%d area=%.0f radius=%.0f" % [name, poly.size(), absf(ShapeLib.signed_area(poly)), radius])
 		_check(ShapeLib.is_valid(poly) and poly.size() <= ShapeLib.MAX_VERTS and radius <= ShapeLib.MAX_RADIUS + 0.01, "お絵描き: %s が形になる" % name)
 
-	# 画面の操作：1Pの欄に丸っこい形、2Pの欄に縦の線を描いて「完成」
+	# F4 キーで開き、もう一度 F4 で閉じる
 	main.load_stage(0)
 	await _frames(5)
 	var screen: CanvasLayer = main.draw_screen
+	await _tap(KEY_F4)
+	_check(screen.visible and get_tree().paused, "F4 でお絵描き画面が開く")
+	await _tap(KEY_F4)
+	_check(not screen.visible and not get_tree().paused, "もう一度 F4 で閉じる")
+
+	# 画面の操作：1Pの欄に丸っこい形、2Pの欄に縦の線を描いて「完成」
 	screen.open(main.drawings)
 	_check(get_tree().paused, "お絵描き画面を開くとゲームが止まる")
 	var blob := PackedVector2Array()
@@ -243,6 +249,14 @@ func _key(code: Key, pressed: bool) -> void:
 	e.keycode = code
 	e.pressed = pressed
 	Input.parse_input_event(e)
+
+
+## キーを押して離す
+func _tap(code: Key) -> void:
+	_key(code, true)
+	await _frames(2)
+	_key(code, false)
+	await _frames(2)
 
 
 func _frames(n: int) -> void:

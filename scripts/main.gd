@@ -205,6 +205,8 @@ func _input(event: InputEvent) -> void:
 					restart()
 				KEY_F4:
 					draw_screen.open(drawings)
+					# 同じ F4 がお絵描き画面の「F4 でやめる」に届いて即閉じないように
+					get_viewport().set_input_as_handled()
 				KEY_F2:
 					load_stage(stage_index - 1)
 				KEY_F3:
